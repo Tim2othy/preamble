@@ -1,0 +1,11 @@
+[package]
+name = "preamble"
+version = "0.1.0"
+entrypoint = "lib.typ"
+authors = ["Timothy Currie"]
+description = "Personal Typst setup for papers and lecture notes."
+
+# `typst init @local/preamble:0.1.0 my-doc` creates my-doc/main.typ from this
+[template]
+path = "template"
+entrypoint = "main.typ"
