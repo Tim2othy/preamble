@@ -1,9 +1,8 @@
 // Theorem-like environments, proofs, exercises and margin notes.
 #import "@preview/ctheorems:1.1.3": thmcounters, thmenv, thmrules
 #import "@preview/marginalia:0.2.3" as marginalia
+#import "colors.typ": palette
 #import "strings.typ": tr
-
-#let theorem-color = rgb("006896")
 
 // "titled": coloured title bar on top. "classic": light box with the title running into the text.
 // Set for a whole document with `paper.with(box-style: ...)`, or per box with `#theorem(style: "classic")[...]`.
@@ -50,7 +49,7 @@
 //   classic: colours of the classic style; `bold` makes its "Theorem 3" bold,
 //   `name-fmt` formats the name, e.g. "(Name)"
 #let _box(identifier, head, color, classic: (:), bold: true, name-fmt: x => [(#x)], numbered: true) = {
-  let classic = (stroke: color, fill: rgb("f3fbfb"), title: color) + classic
+  let classic = (stroke: color, fill: palette.classic-fill, title: color) + classic
   let fmt(name, number, body, style: auto) = context {
     let style = if style == auto { box-style.get() } else { style }
     let title = if number == none { head } else [#head #number]
@@ -70,8 +69,10 @@
 // Numbered box. All boxes made with this share one counter.
 // `bold` makes the "Theorem 3" part of the classic title bold.
 #let new-theorem(head, bold: true) = _box(
-  "theorem", head, rgb("#2c62a3"),
-  classic: (stroke: rgb("0000ff"), title: theorem-color),
+  "theorem",
+  head,
+  palette.theorem,
+  classic: (stroke: palette.classic-theorem, title: palette.teal),
   bold: bold,
 )
 
@@ -80,22 +81,31 @@
 
 // Box that shows only its name, e.g. a named theorem: #t-no-num[Satz von Bolzano-Weierstraß][...]
 #let t-no-num = _box(
-  "theorem", "", rgb("#2c62a3"),
-  classic: (stroke: rgb("0000ff"), title: theorem-color),
-  name-fmt: strong, numbered: false,
+  "theorem",
+  "",
+  palette.theorem,
+  classic: (stroke: palette.classic-theorem, title: palette.teal),
+  name-fmt: strong,
+  numbered: false,
 )
 
 // Green box with a title, e.g. #cool-box("Parameters")[...]
 #let cool-box = _box(
-  "Parameters", "", rgb("#2e8540"),
-  classic: (stroke: rgb("#36c369"), title: rgb("#2aa728")),
-  name-fmt: x => x, numbered: false,
+  "Parameters",
+  "",
+  palette.cool,
+  classic: (stroke: palette.classic-cool, title: palette.classic-cool-title),
+  name-fmt: x => x,
+  numbered: false,
 )
 
 #let example = _box(
-  "Example", tr("example"), rgb("#9a6b12"),
-  classic: (stroke: rgb("#ac7f1e"), title: rgb("#a58c1d")),
-  bold: false, numbered: false,
+  "Example",
+  tr("example"),
+  palette.example,
+  classic: (stroke: palette.classic-example, title: palette.classic-example-title),
+  bold: false,
+  numbered: false,
 )
 
 // Show rules for the boxes above. `project` applies them already.
@@ -135,14 +145,14 @@
 #let exercise(title, body) = pad(
   x: 0.5em,
   y: 0.6em,
-  block(width: 100%, breakable: true, fill: rgb("#eeeeee"), outset: 0.9em)[#strong(title) \ #body],
+  block(width: 100%, breakable: true, fill: palette.exercise-fill, outset: 0.9em)[#strong(title) \ #body],
 )
 
 // Margin note, numbered A, B, C, ...
 #let note = marginalia.note.with(
-  numbering: (..i) => text(weight: 500, size: 8pt, fill: rgb("#e604b1"), numbering("A", ..i)),
+  numbering: (..i) => text(weight: 500, size: 8pt, fill: palette.note-number, numbering("A", ..i)),
   block-style: (
-    fill: oklch(90%, 0.06, 140deg),
+    fill: palette.note-fill,
     outset: (left: 10pt, rest: 4pt),
     radius: 4pt,
   ),

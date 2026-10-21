@@ -24,6 +24,8 @@ This links this folder to `%APPDATA%\typst\packages\local\preamble\<version>`, s
 
 To start a new document from a template: `typst init @local/preamble:0.1.0 my-doc`.
 
+For a Palatino look like LaTeX's `mathpazo`, use `font: "TeX Gyre Pagella", math-font: "TeX Gyre Pagella Math"`. Both fonts are in TeX Live (`tex-gyre`, `tex-gyre-math`) or at gust.org.pl; install them so Typst finds them (`typst fonts` lists what it sees).
+
 Any normal set rule after the `#show:` line overrides the template, e.g. `#set par(first-line-indent: 0pt)`.
 
 ## Options
@@ -41,6 +43,7 @@ Options marked *preset* default to `auto` and take the value of the chosen style
 | `toc` *preset* | `true` | `true` | table of contents after the title |
 | `lang` *preset* | `"en"` | `"de"` | also switches "Proof"/"Beweis", "Theorem"/"Satz", ... |
 | `font` *preset* | New Computer Modern | Libertinus Serif | |
+| `math-font` *preset* | New Computer Modern Math | New Computer Modern Math | |
 | `sans-font` *preset* | Noto Sans | Noto Sans | skript headings and bold text |
 | `font-size` *preset* | 11pt | 11pt | title sizes scale with it |
 | `paper-size` | `"a4"` | `"a4"` | |

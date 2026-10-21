@@ -1,5 +1,6 @@
 // Boxes in the style of Evan Chen's Napkin, taken from https://github.com/napkin-community/solutions
 // Usage: #blue_box(subtitle: [optional])[Lemma 1][content]
+#import "colors.typ": palette
 
 #let latexize(content) = [
   #show math.equation: set text(features: ("cv01",))
@@ -13,12 +14,12 @@
 // Brown box, used for examples.
 #let brown_box(title, content, subtitle: none) = block(
   width: 100%,
-  stroke: 1pt + rgb("9e3c0e"),
-  fill: rgb("fff9f8"),
+  stroke: 1pt + palette.napkin-brown,
+  fill: palette.napkin-brown-fill,
   radius: 0.5em,
   inset: 1em,
   latexize[
-    #text(fill: rgb("9e3c0e"), titlize(title, subtitle))
+    #text(fill: palette.napkin-brown, titlize(title, subtitle))
 
     #content
   ],
@@ -28,7 +29,7 @@
 #let black_note(title, content, subtitle: none) = block(
   width: 100%,
   stroke: (left: 3pt + black),
-  fill: rgb("fafafa"),
+  fill: palette.napkin-grey-fill,
   inset: (left: 1em, right: 1em, y: 1em),
   latexize[
     #titlize_dot(title, subtitle)
@@ -39,11 +40,11 @@
 // Note with a green left strip, used for remarks.
 #let green_note(title, content, subtitle: none) = block(
   width: 100%,
-  stroke: (left: 3pt + rgb("008000")),
-  fill: rgb("f2f9f5"),
+  stroke: (left: 3pt + palette.napkin-green),
+  fill: palette.napkin-green-fill,
   inset: (left: 3pt + 1em, right: 1em, y: 1em),
   latexize[
-    #text(fill: rgb("008000"))[#titlize(title, subtitle) #sym.dash.em]
+    #text(fill: palette.napkin-green)[#titlize(title, subtitle) #sym.dash.em]
     #content
   ],
 )
@@ -51,20 +52,20 @@
 // Green box, used for results of remarks.
 #let green_box(content) = block(
   width: 100%,
-  stroke: 1pt + rgb("00b200"),
+  stroke: 1pt + palette.napkin-green-frame,
   inset: (x: 1em, y: 0.65em),
-  latexize[#text(fill: rgb("008000"), [*#content*])],
+  latexize[#text(fill: palette.napkin-green, [*#content*])],
 )
 
 // Blue box, used for theorems, lemmas, corollaries and propositions.
 #let blue_box(title, content, subtitle: none) = block(
   width: 100%,
-  stroke: 1pt + rgb("0000ff"),
-  fill: rgb("f3fbfb"),
+  stroke: 1pt + palette.classic-theorem,
+  fill: palette.classic-fill,
   radius: 0.5em,
   inset: 1em,
   latexize[
-    #text(fill: rgb("006896"), titlize(title, subtitle))
+    #text(fill: palette.teal, titlize(title, subtitle))
 
     #content
   ],

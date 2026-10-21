@@ -8,6 +8,7 @@
 #import "@preview/marginalia:0.2.3" as marginalia
 #import "page-lines.typ": downlines, uplines
 #import "strings.typ": tr
+#import "colors.typ": palette
 #import "environments.typ": box-style as box-style-state, theorem-rules
 
 #let presets = (
@@ -15,6 +16,7 @@
   paper: (
     lang: "en",
     font: ("New Computer Modern", "Libertinus Serif"),
+    math-font: "New Computer Modern Math",
     sans-font: "Noto Sans",
     font-size: 11pt,
     margin: 3.2cm,
@@ -23,12 +25,13 @@
     equation-numbering: "(1)",
     box-style: "titled",
     date-format: "[day].[month].[year]",
-    colors: (accent: rgb("#19197f"), link: rgb("006896")),
+    colors: (accent: palette.paper-accent, link: palette.teal),
   ),
   // Lecture notes: title page with table of contents, sans-serif headings with "§1.1"
   skript: (
     lang: "de",
     font: "Libertinus Serif",
+    math-font: "New Computer Modern Math",
     sans-font: "Noto Sans",
     font-size: 11pt,
     margin: 3cm,
@@ -37,7 +40,7 @@
     equation-numbering: none,
     box-style: "titled",
     date-format: "[day] [month repr:long] [year]",
-    colors: (title: eastern, headers: maroon, theorem: rgb("006896"), link: blue),
+    colors: (title: eastern, headers: maroon, theorem: palette.teal, link: blue),
   ),
 )
 
@@ -89,6 +92,8 @@
       h(7pt, weak: true)
     }
     set text(weight: 500)
+    // Otherwise a heading after a paragraph gets the paragraph indent
+    set par(first-line-indent: 0pt)
     v(25pt, weak: true)
     number
     it.body
@@ -193,8 +198,8 @@
       bottom: stroke,
     )
     set table(
-      stroke: tableframe(rgb("#21222c")),
-      fill: (_, y) => if (y == 0) { rgb("#ffeeff") } else if calc.even(y) { rgb("#eaf2f5") },
+      stroke: tableframe(palette.table-frame),
+      fill: (_, y) => if (y == 0) { palette.table-head } else if calc.even(y) { palette.table-stripe },
     )
     fig
   }
@@ -336,6 +341,8 @@
   toc: auto,
   lang: auto,
   font: auto,
+  // Palatino look (as LaTeX's mathpazo): font: "TeX Gyre Pagella", math-font: "TeX Gyre Pagella Math"
+  math-font: auto,
   // Used for headings and bold text in the skript.
   sans-font: auto,
   font-size: auto,
@@ -384,6 +391,7 @@
 
   set document(title: title, author: names.filter(n => type(n) == str))
   set text(font: pick(font, "font"), size: cfg.font-size, lang: pick(lang, "lang"))
+  show math.equation: set text(font: pick(math-font, "math-font"))
   set page(paper: paper-size, margin: (x: margin-x, y: margin-y))
   set heading(numbering: heading-numbering)
 
