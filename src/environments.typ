@@ -1,59 +1,102 @@
 // Theorem-like environments, proofs, exercises and margin notes.
-#import "@preview/ctheorems:1.1.3": thmbox, thmcounters, thmrules
+#import "@preview/ctheorems:1.1.3": thmcounters, thmenv, thmrules
 #import "@preview/marginalia:0.2.3" as marginalia
 #import "strings.typ": tr
 
 #let theorem-color = rgb("006896")
 
-// Light blue numbered box. All boxes made with this share one counter.
-// `bold` makes the "Theorem 3" part of the title bold.
-#let new-theorem(head, bold: true) = thmbox(
-  "theorem",
-  head,
-  fill: rgb("f3fbfb"),
-  stroke: 1pt + rgb("0000ff"),
-  breakable: true,
-  base_level: 0,
-  namefmt: x => text(fill: theorem-color)[(#x)],
-  titlefmt: x => text(fill: theorem-color, if bold { strong(x) } else { x }),
+// "titled": coloured title bar on top. "classic": light box with the title running into the text.
+// Set for a whole document with `paper.with(box-style: ...)`, or per box with `#theorem(style: "classic")[...]`.
+#let box-style = state("preamble-box-style", "titled")
+
+// Box whose top and bottom edges are separate blocks, so a box split across pages
+// stays open at the page break instead of being closed on both pages.
+// Needs context (for the page colour).
+#let _frame(color, fill, header, body, radius: 4pt, inset: 1em) = {
+  let stroke = 1pt + color
+  let top = if header == none {
+    block(width: 100%, height: radius, fill: fill, stroke: (top: stroke, x: stroke), radius: (top: radius))
+  } else {
+    block(width: 100%, fill: color, stroke: stroke, radius: (top: radius), inset: (x: inset, y: 0.5em), header)
+  }
+  // The bottom edge overlaps the last `radius` of the body, so it always fits on the body's last page.
+  // Its corners are first painted in the page colour to hide the body's square corners.
+  let background = if type(page.fill) == std.color { page.fill } else { white }
+  let bottom = block(width: 100%, height: radius, {
+    place(dx: -stroke.thickness, rect(width: 100% + 2 * stroke.thickness, height: 100%, fill: background))
+    place(rect(width: 100%, height: 100%, fill: fill, stroke: (bottom: stroke, x: stroke), radius: (bottom: radius)))
+  })
+  let pad-y = if header == none { inset - radius } else { inset * 0.8 }
+  pad(y: 0.5em, {
+    block(sticky: true, above: 0pt, below: 0pt, top)
+    block(
+      breakable: true,
+      above: 0pt,
+      below: 0pt,
+      width: 100%,
+      fill: fill,
+      stroke: (x: stroke),
+      inset: (x: inset, top: pad-y, bottom: pad-y + radius),
+      body,
+    )
+    v(-radius)
+    block(above: 0pt, below: 0pt, bottom)
+  })
+}
+
+// A ctheorems environment drawn with `_frame`.
+//   head: "Theorem", or "" for boxes that only show their name
+//   color: frame and title bar of the titled style
+//   classic: colours of the classic style; `bold` makes its "Theorem 3" bold,
+//   `name-fmt` formats the name, e.g. "(Name)"
+#let _box(identifier, head, color, classic: (:), bold: true, name-fmt: x => [(#x)], numbered: true) = {
+  let classic = (stroke: color, fill: rgb("f3fbfb"), title: color) + classic
+  let fmt(name, number, body, style: auto) = context {
+    let style = if style == auto { box-style.get() } else { style }
+    let title = if number == none { head } else [#head #number]
+    if style == "titled" {
+      let header = (if head != "" { title }, name).filter(x => x != none).join[: ]
+      _frame(color, color.lighten(94%), text(fill: white, weight: "bold", header), body)
+    } else {
+      let title = text(fill: classic.title, if bold { strong(title) } else { title })
+      let name = if name == none { [] } else [ #text(fill: classic.title, name-fmt(name))]
+      _frame(classic.stroke, classic.fill, none, [#title#name#h(0.1em):#h(0.2em)#body], radius: 0.3em, inset: 1.2em)
+    }
+  }
+  let env = thmenv(identifier, "heading", 0, fmt).with(supplement: head)
+  if numbered { env } else { env.with(numbering: none) }
+}
+
+// Numbered box. All boxes made with this share one counter.
+// `bold` makes the "Theorem 3" part of the classic title bold.
+#let new-theorem(head, bold: true) = _box(
+  "theorem", head, rgb("#2c62a3"),
+  classic: (stroke: rgb("0000ff"), title: theorem-color),
+  bold: bold,
 )
 
 #let theorem = new-theorem(tr("theorem"))
 #let proposition = new-theorem(tr("proposition"), bold: false)
 
-// Theorem box that shows only its name, e.g. a named theorem: #t-no-num[Satz von Bolzano-Weierstraß][...]
-#let t-no-num = thmbox(
-  "theorem",
-  "",
-  fill: rgb("f3fbfb"),
-  stroke: 1pt + rgb("0000ff"),
-  breakable: true,
-  base_level: 0,
-  namefmt: x => strong(text(fill: theorem-color, x)),
-).with(numbering: none)
+// Box that shows only its name, e.g. a named theorem: #t-no-num[Satz von Bolzano-Weierstraß][...]
+#let t-no-num = _box(
+  "theorem", "", rgb("#2c62a3"),
+  classic: (stroke: rgb("0000ff"), title: theorem-color),
+  name-fmt: strong, numbered: false,
+)
 
 // Green box with a title, e.g. #cool-box("Parameters")[...]
-#let cool-box = thmbox(
-  "Parameters",
-  "Parameters",
-  fill: rgb("f3fbfb"),
-  stroke: 1pt + rgb("#36c369"),
-  breakable: true,
-  base_level: 0,
-  namefmt: x => text(fill: rgb("#2aa728"))[#x],
-  titlefmt: x => text(fill: rgb("#2aa728"), ""),
-).with(numbering: none)
+#let cool-box = _box(
+  "Parameters", "", rgb("#2e8540"),
+  classic: (stroke: rgb("#36c369"), title: rgb("#2aa728")),
+  name-fmt: x => x, numbered: false,
+)
 
-#let example = thmbox(
-  "Example",
-  tr("example"),
-  fill: rgb("f3fbfb"),
-  stroke: 1pt + rgb("#ac7f1e"),
-  breakable: true,
-  base_level: 0,
-  namefmt: x => text(fill: rgb("#a58c1d"))[(#x)],
-  titlefmt: x => text(fill: rgb("#a58c1d"), x),
-).with(numbering: none)
+#let example = _box(
+  "Example", tr("example"), rgb("#9a6b12"),
+  classic: (stroke: rgb("#ac7f1e"), title: rgb("#a58c1d")),
+  bold: false, numbered: false,
+)
 
 // Show rules for the boxes above. `project` applies them already.
 // References to an unnumbered box show its name, numbered ones show e.g. "Satz 3".

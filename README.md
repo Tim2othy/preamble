@@ -49,17 +49,27 @@ Options marked *preset* default to `auto` and take the value of the chosen style
 | `heading-numbering` | `"1.1"` | `"1.1"` | |
 | `equation-numbering` *preset* | `"(1)"` | `none` | only labelled equations get a number |
 | `report-style` | | `false` | skript: level-1 headings as "Kapitel 1." |
+| `box-style` *preset* | `"titled"` | `"titled"` | theorem boxes: `"titled"` (coloured title bar) or `"classic"` (title runs into the text) |
 | `colors` | | | override single colours, e.g. `(accent: maroon)`; see `presets` in `src/project.typ` |
 
 ## What else is exported
 
 - `appendix`: `#show: appendix.with(bib: bibliography("works.yml"))` prints the bibliography and switches headings to A.1
-- Theorem boxes (blue, one shared counter): `theorem`, `proposition`, `new-theorem("Lemma")` for more, `t-no-num[Name][...]` for named unnumbered ones
+- Theorem boxes (blue, one shared counter): `theorem`, `proposition`, `new-theorem("Lemma")` for more, `t-no-num[Name][...]` for named unnumbered ones. A box split across pages is left open at the page break. One box in the other style: `#theorem(style: "classic")[...]`
 - `example`, `cool-box("Title")[...]`, `exercise[Aufgabe 1][...]`
 - `proof[...]`, `proof(of: <label>)[...]`, `proof(title: [...])[...]`
 - Napkin-style boxes: `blue_box`, `brown_box`, `plain_box`, `green_note`, `black_note`, `green_box`
 - `note[...]`: margin note
 - `prose[@key]`: citation in running text; `blkm`, `redm`: black or red text, e.g. inside coloured equations
+
+## Testing changes
+
+`test/` has documents that use the package the same way real documents do. Because the package is linked, not copied, saved changes show up straight away, so keep one of them open while editing:
+
+```powershell
+typst watch test/paper.typ   # a short paper
+typst watch test/boxes.typ   # every box in both styles, including boxes split across pages
+```
 
 ## CI
 

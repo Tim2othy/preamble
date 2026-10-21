@@ -8,7 +8,7 @@
 #import "@preview/marginalia:0.2.3" as marginalia
 #import "page-lines.typ": downlines, uplines
 #import "strings.typ": tr
-#import "environments.typ": theorem-rules
+#import "environments.typ": box-style as box-style-state, theorem-rules
 
 #let presets = (
   // AMS-article like: centered title block, running header, run-in bold paragraphs
@@ -21,6 +21,7 @@
     page-lines: true,
     toc: true,
     equation-numbering: "(1)",
+    box-style: "titled",
     date-format: "[day].[month].[year]",
     colors: (accent: rgb("#19197f"), link: rgb("006896")),
   ),
@@ -34,6 +35,7 @@
     page-lines: false,
     toc: true,
     equation-numbering: none,
+    box-style: "titled",
     date-format: "[day] [month repr:long] [year]",
     colors: (title: eastern, headers: maroon, theorem: rgb("006896"), link: blue),
   ),
@@ -347,6 +349,8 @@
   equation-numbering: auto,
   // skript: level-1 headings become "Chapter 1." instead of "§1".
   report-style: false,
+  // Theorem boxes: "titled" (coloured title bar) or "classic" (title runs into the text).
+  box-style: auto,
   // Overrides single colours of the preset, e.g. (accent: maroon).
   colors: (:),
   body,
@@ -397,7 +401,7 @@
     clearance: 7mm,
   )
 
-  _styles.at(style)(cfg, body)
+  _styles.at(style)(cfg, box-style-state.update(pick(box-style, "box-style")) + body)
 }
 
 #let paper = project.with(style: "paper")
