@@ -53,6 +53,7 @@ Options marked *preset* default to `auto` and take the value of the chosen style
 | `equation-numbering` *preset* | `"(1)"` | `none` | only labelled equations get a number |
 | `report-style` | | `false` | skript: level-1 headings as "Kapitel 1." |
 | `box-style` *preset* | `"titled"` | `"titled"` | theorem boxes: `"titled"` (coloured title bar) or `"classic"` (title runs into the text) |
+| `color-math` | `false` | `false` | `true` colours all math dark blue (`colors.math`), or pass a colour, e.g. `color-math: maroon` |
 | `colors` | | | override single colours, e.g. `(accent: maroon)`; see `presets` in `src/project.typ` |
 
 ## What else is exported
@@ -63,7 +64,7 @@ Options marked *preset* default to `auto` and take the value of the chosen style
 - `proof[...]`, `proof(of: <label>)[...]`, `proof(title: [...])[...]`
 - Napkin-style boxes: `blue_box`, `brown_box`, `plain_box`, `green_note`, `black_note`, `green_box`
 - `note[...]`: margin note
-- `prose[@key]`: citation in running text; `blkm`, `redm`: black or red text, e.g. inside coloured equations
+- `prose[@key]`: citation in running text; `blkm`, `redm`: black or red text, e.g. inside equations coloured with `color-math`
 
 ## Testing changes
 

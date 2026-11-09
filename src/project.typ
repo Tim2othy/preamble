@@ -25,7 +25,7 @@
     equation-numbering: "(1)",
     box-style: "titled",
     date-format: "[day].[month].[year]",
-    colors: (accent: palette.paper-accent, link: palette.teal),
+    colors: (accent: palette.paper-accent, link: palette.teal, math: palette.paper-accent),
   ),
   // Lecture notes: title page with table of contents, sans-serif headings with "§1.1"
   skript: (
@@ -40,7 +40,7 @@
     equation-numbering: none,
     box-style: "titled",
     date-format: "[day] [month repr:long] [year]",
-    colors: (title: eastern, headers: maroon, theorem: palette.teal, link: blue),
+    colors: (title: eastern, headers: maroon, theorem: palette.teal, link: blue, math: palette.paper-accent),
   ),
 )
 
@@ -107,7 +107,6 @@
   show strong: it => text(accent, it) + h(1em)
 
   show math.equation: set block(below: 8pt, above: 9pt)
-  show math.equation: set text(accent)
 
   set figure(placement: top)
   show selector.or(table, image): pad.with(x: 23pt)
@@ -360,6 +359,8 @@
   box-style: auto,
   // Overrides single colours of the preset, e.g. (accent: maroon).
   colors: (:),
+  // Colour all math: true uses the preset's `math` colour (dark blue), or pass a colour.
+  color-math: false,
   body,
 ) = {
   assert(style in _styles, message: "style must be one of " + _styles.keys().join(", "))
@@ -392,6 +393,8 @@
   set document(title: title, author: names.filter(n => type(n) == str))
   set text(font: pick(font, "font"), size: cfg.font-size, lang: pick(lang, "lang"))
   show math.equation: set text(font: pick(math-font, "math-font"))
+  let math-color = if color-math == true { cfg.colors.math } else if color-math == false { none } else { color-math }
+  show math.equation: set text(fill: math-color) if math-color != none
   set page(paper: paper-size, margin: (x: margin-x, y: margin-y))
   set heading(numbering: heading-numbering)
 
