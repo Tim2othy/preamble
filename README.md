@@ -26,7 +26,7 @@ To start a new document from a template: `typst init @local/preamble:0.1.0 my-do
 
 For a Palatino look like LaTeX's `mathpazo`, use `font: "TeX Gyre Pagella", math-font: "TeX Gyre Pagella Math"`. Both fonts are in TeX Live (`tex-gyre`, `tex-gyre-math`) or at gust.org.pl; install them so Typst finds them (`typst fonts` lists what it sees).
 
-Any normal set rule after the `#show:` line overrides the template, e.g. `#set par(first-line-indent: 0pt)`.
+Any normal set rule after the `#show:` line overrides the template, e.g. `#set par(first-line-indent: 1.5em)` to indent the first line of each paragraph (off by default).
 
 ## Options
 
@@ -40,6 +40,7 @@ Options marked *preset* default to `auto` and take the value of the chosen style
 | `abstract` | | | paper only |
 | `draft` | `false` | | `true`, or a URL where the latest version lives |
 | `show-title` | `true` | `true` | title block / title page |
+| `running-header` | `false` | `false` | title and authors at the top of each page (page numbers are shown either way) |
 | `toc` *preset* | `true` | `true` | table of contents after the title |
 | `lang` *preset* | `"en"` | `"de"` | also switches "Proof"/"Beweis", "Theorem"/"Satz", ... |
 | `font` *preset* | New Computer Modern | Libertinus Serif | |
@@ -48,7 +49,7 @@ Options marked *preset* default to `auto` and take the value of the chosen style
 | `font-size` *preset* | 11pt | 11pt | title sizes scale with it |
 | `paper-size` | `"a4"` | `"a4"` | |
 | `margin` *preset* | 3.2cm | 3cm | length or `(x: ..., y: ...)` |
-| `page-lines` *preset* | `true` | `false` | crop-mark decorations |
+| `page-lines` | `false` | `false` | crop-mark decorations; `true` turns them on |
 | `heading-numbering` | `"1.1"` | `"1.1"` | |
 | `equation-numbering` *preset* | `"(1)"` | `none` | only labelled equations get a number |
 | `report-style` | | `false` | skript: level-1 headings as "Kapitel 1." |

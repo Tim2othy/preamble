@@ -20,7 +20,6 @@
     sans-font: "Noto Sans",
     font-size: 11pt,
     margin: 3.2cm,
-    page-lines: true,
     toc: true,
     equation-numbering: "(1)",
     box-style: "titled",
@@ -35,7 +34,6 @@
     sans-font: "Noto Sans",
     font-size: 11pt,
     margin: 3cm,
-    page-lines: false,
     toc: true,
     equation-numbering: none,
     box-style: "titled",
@@ -59,14 +57,15 @@
   let accent = cfg.colors.accent
 
   set page(
-    // Odd pages show the title, even pages the authors; nothing on page 1.
+    // Page number top right from page 2 on. With `running-header`, odd pages also
+    // show the title and even pages the authors.
     header-ascent: 14pt,
     header: context {
       let i = counter(page).get().first()
       if cfg.page-lines { uplines(cfg.margin-x) }
       if i > 1 {
         set text(size: script-size)
-        let running = if calc.odd(i) { cfg.title } else { cfg.author-string }
+        let running = if not cfg.running-header { none } else if calc.odd(i) { cfg.title } else { cfg.author-string }
         grid(
           columns: (6em, 1fr, 6em),
           align: (start, center, end),
@@ -92,8 +91,6 @@
       h(7pt, weak: true)
     }
     set text(weight: 500)
-    // Otherwise a heading after a paragraph gets the paragraph indent
-    set par(first-line-indent: 0pt)
     v(25pt, weak: true)
     number
     it.body
@@ -135,7 +132,7 @@
     })
   }
 
-  set par(justify: true, spacing: 1.25em, first-line-indent: 1.5em, leading: 0.85em)
+  set par(justify: true, spacing: 1.25em, leading: 0.85em)
 
   if cfg.abstract != none {
     v(20pt, weak: true)
@@ -159,7 +156,6 @@
   // Author details at the end
   v(12pt, weak: true)
   show: pad.with(x: 11.5pt)
-  set par(first-line-indent: 0pt)
   set text(script-size)
   for author in cfg.authors {
     let keys = ("department", "organization", "location")
@@ -204,12 +200,12 @@
   }
 
   set page(
-    // Title and author on the right, except on the title page
+    // With `running-header`: title and author on the right, except on the title page
     header: context {
       if cfg.page-lines { uplines(cfg.margin-x) }
       set align(right)
       set text(size: 0.8em)
-      if not cfg.show-title or counter(page).get().first() > 1 {
+      if cfg.running-header and (not cfg.show-title or counter(page).get().first() > 1) {
         text(weight: "bold", cfg.title)
         if cfg.author-string != none {
           h(0.2em)
@@ -334,6 +330,8 @@
   abstract: none,
   // true, or a URL string where the latest version lives.
   draft: false,
+  // Title (odd pages) and authors (even pages) at the top of each page; the skript shows both.
+  running-header: false,
   // Show the title block (paper) or title page (skript).
   show-title: true,
   // Table of contents after the title.
@@ -348,8 +346,8 @@
   paper-size: "a4",
   // A length, or (x: ..., y: ...).
   margin: auto,
-  // Crop-mark style decorations around the text area.
-  page-lines: auto,
+  // Crop-mark style decorations around the text area; off unless set to true.
+  page-lines: false,
   heading-numbering: "1.1",
   // Only labelled equations get a number. none turns numbering off.
   equation-numbering: auto,
@@ -380,11 +378,12 @@
     abstract: abstract,
     draft: draft,
     show-title: show-title,
+    running-header: running-header,
     toc: pick(toc, "toc"),
     font-size: pick(font-size, "font-size"),
     sans-font: pick(sans-font, "sans-font"),
     margin-x: margin-x,
-    page-lines: pick(page-lines, "page-lines"),
+    page-lines: page-lines,
     report-style: report-style,
     colors: preset.colors + colors,
   )
