@@ -49,6 +49,11 @@
   authors.map(a => if type(a) == dictionary { a } else { (name: a) })
 }
 
+// "A", "A and B", "A, B, and C"
+#let _join-names(names) = {
+  if names.len() == 2 { names.join([ #tr("and-word") ]) } else { names.join(", ", last: [, #tr("and-word") ]) }
+}
+
 #let _paper(cfg, body) = {
   let scale = cfg.font-size / 11pt
   let script-size = 9pt * scale
@@ -103,8 +108,6 @@
   // Bold text works as a run-in paragraph heading: *Related Literature.* Text...
   show strong: it => text(accent, it) + h(1em)
 
-  show math.equation: set block(below: 8pt, above: 9pt)
-
   set figure(placement: top)
   show selector.or(table, image): pad.with(x: 23pt)
 
@@ -118,8 +121,12 @@
         text(size: large-size, cfg.subtitle)
       }
       if cfg.author-string != none {
+        // Email addresses go in a footnote (*, †, ...) at the bottom of the first page
+        let marked = cfg.authors.map(a => if "email" in a {
+          [#a.name#footnote(numbering: "*", link("mailto:" + a.email, a.email))]
+        } else { a.name })
         v(25pt, weak: true)
-        text(size: large-size, cfg.author-string)
+        text(size: large-size, _join-names(marked))
       }
       if cfg.date != none {
         v(10pt, weak: true)
@@ -130,6 +137,8 @@
         text(size: script-size, tr("draft", if type(cfg.draft) == str { cfg.draft }))
       }
     })
+    // Footnotes in the text start at 1 again
+    counter(footnote).update(0)
   }
 
   set par(justify: true, spacing: 1.25em, leading: 0.85em)
@@ -145,25 +154,32 @@
   show link: set text(fill: cfg.colors.link)
   show: theorem-rules
 
-  v(29pt, weak: true)
+  // Table of contents centered vertically in the space left on the first page
   if cfg.toc {
+    v(1fr)
     outline()
+    v(1fr)
     pagebreak()
+  } else {
+    v(29pt, weak: true)
   }
 
   body
 
-  // Author details at the end
+  // Author details at the end (email is on the first page). Emits nothing when there
+  // are no details, otherwise a `set page` in the body would push it onto an empty page.
+  let keys = ("department", "organization", "location")
+  let detailed = cfg.authors.filter(a => "url" in a or keys.any(key => key in a))
+  if detailed.len() == 0 { return }
   v(12pt, weak: true)
   show: pad.with(x: 11.5pt)
   set text(script-size)
-  for author in cfg.authors {
-    let keys = ("department", "organization", "location")
-    smallcaps(keys.filter(key => key in author).map(key => author.at(key)).join(", "))
-    linebreak()
-    if "email" in author [
-      _Email address:_ #link("mailto:" + author.email) \
-    ]
+  for author in detailed {
+    let place = keys.filter(key => key in author).map(key => author.at(key))
+    if place.len() > 0 {
+      smallcaps(place.join(", "))
+      linebreak()
+    }
     if "url" in author [
       _URL:_ #link(author.url)
     ]
@@ -373,7 +389,7 @@
     title: title,
     subtitle: subtitle,
     authors: authors,
-    author-string: if names.len() == 2 { names.join([ #tr("and-word") ]) } else { names.join(", ", last: [, #tr("and-word") ]) },
+    author-string: _join-names(names),
     date: if type(date) == datetime { date.display(preset.date-format) } else { date },
     abstract: abstract,
     draft: draft,
@@ -397,6 +413,7 @@
   set page(paper: paper-size, margin: (x: margin-x, y: margin-y))
   set heading(numbering: heading-numbering)
 
+  show math.equation.where(block: true): set block(above: 13pt, below: 13pt)
   set math.equation(numbering: equation-numbering) if equation-numbering != none
   show: if equation-numbering != none { equate.with(number-mode: "label") } else { it => it }
 
